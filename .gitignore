@@ -1,0 +1,47 @@
+# Datos grandes - no subir a git
+datos/raw/*.data
+datos/raw/*.txt
+datos/raw/*.gz
+datos/raw/*.zip
+datos/processed/*.parquet
+datos/processed/*.csv
+
+# Archivos temporales de Spark
+metastore_db/
+derby.log
+spark-warehouse/
+
+# Archivos de log
+*.log
+
+# Archivos temporales de Scala
+*.class
+*.cache
+target/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de IDE
+.idea/
+*.iml
+.vscode/
+.metals/
+.bloop/
+
+# Notebooks temporales
+notebooks/.ipynb_checkpoints/
+*.ipynb
+
+# Archivos de backup
+*~
+*.bak
+*.swp
+
+# Archivos compilados
+*.pyc
+__pycache__/
+
+# Archivos de configuración local
+local_config.scala
