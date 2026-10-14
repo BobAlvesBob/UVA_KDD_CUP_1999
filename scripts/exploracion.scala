@@ -43,59 +43,65 @@ val columnNames = Array(
 )
 
 // Definir el schema del dataset
+// NOTA: nullable = true permite manejar valores vacíos/nulos en los datos
 val schema = StructType(Array(
-  StructField("duration", IntegerType, nullable = false),
-  StructField("protocol_type", StringType, nullable = false),
-  StructField("service", StringType, nullable = false),
-  StructField("flag", StringType, nullable = false),
-  StructField("src_bytes", IntegerType, nullable = false),
-  StructField("dst_bytes", IntegerType, nullable = false),
-  StructField("land", IntegerType, nullable = false),
-  StructField("wrong_fragment", IntegerType, nullable = false),
-  StructField("urgent", IntegerType, nullable = false),
-  StructField("hot", IntegerType, nullable = false),
-  StructField("num_failed_logins", IntegerType, nullable = false),
-  StructField("logged_in", IntegerType, nullable = false),
-  StructField("num_compromised", IntegerType, nullable = false),
-  StructField("root_shell", IntegerType, nullable = false),
-  StructField("su_attempted", IntegerType, nullable = false),
-  StructField("num_root", IntegerType, nullable = false),
-  StructField("num_file_creations", IntegerType, nullable = false),
-  StructField("num_shells", IntegerType, nullable = false),
-  StructField("num_access_files", IntegerType, nullable = false),
-  StructField("num_outbound_cmds", IntegerType, nullable = false),
-  StructField("is_host_login", IntegerType, nullable = false),
-  StructField("is_guest_login", IntegerType, nullable = false),
-  StructField("count", IntegerType, nullable = false),
-  StructField("srv_count", IntegerType, nullable = false),
-  StructField("serror_rate", DoubleType, nullable = false),
-  StructField("srv_serror_rate", DoubleType, nullable = false),
-  StructField("rerror_rate", DoubleType, nullable = false),
-  StructField("srv_rerror_rate", DoubleType, nullable = false),
-  StructField("same_srv_rate", DoubleType, nullable = false),
-  StructField("diff_srv_rate", DoubleType, nullable = false),
-  StructField("srv_diff_host_rate", DoubleType, nullable = false),
-  StructField("dst_host_count", IntegerType, nullable = false),
-  StructField("dst_host_srv_count", IntegerType, nullable = false),
-  StructField("dst_host_same_srv_rate", DoubleType, nullable = false),
-  StructField("dst_host_diff_srv_rate", DoubleType, nullable = false),
-  StructField("dst_host_same_src_port_rate", DoubleType, nullable = false),
-  StructField("dst_host_srv_diff_host_rate", DoubleType, nullable = false),
-  StructField("dst_host_serror_rate", DoubleType, nullable = false),
-  StructField("dst_host_srv_serror_rate", DoubleType, nullable = false),
-  StructField("dst_host_rerror_rate", DoubleType, nullable = false),
-  StructField("dst_host_srv_rerror_rate", DoubleType, nullable = false),
-  StructField("attack_type", StringType, nullable = false)
+  StructField("duration", IntegerType, nullable = true),
+  StructField("protocol_type", StringType, nullable = true),
+  StructField("service", StringType, nullable = true),
+  StructField("flag", StringType, nullable = true),
+  StructField("src_bytes", IntegerType, nullable = true),
+  StructField("dst_bytes", IntegerType, nullable = true),
+  StructField("land", IntegerType, nullable = true),
+  StructField("wrong_fragment", IntegerType, nullable = true),
+  StructField("urgent", IntegerType, nullable = true),
+  StructField("hot", IntegerType, nullable = true),
+  StructField("num_failed_logins", IntegerType, nullable = true),
+  StructField("logged_in", IntegerType, nullable = true),
+  StructField("num_compromised", IntegerType, nullable = true),
+  StructField("root_shell", IntegerType, nullable = true),
+  StructField("su_attempted", IntegerType, nullable = true),
+  StructField("num_root", IntegerType, nullable = true),
+  StructField("num_file_creations", IntegerType, nullable = true),
+  StructField("num_shells", IntegerType, nullable = true),
+  StructField("num_access_files", IntegerType, nullable = true),
+  StructField("num_outbound_cmds", IntegerType, nullable = true),
+  StructField("is_host_login", IntegerType, nullable = true),
+  StructField("is_guest_login", IntegerType, nullable = true),
+  StructField("count", IntegerType, nullable = true),
+  StructField("srv_count", IntegerType, nullable = true),
+  StructField("serror_rate", DoubleType, nullable = true),
+  StructField("srv_serror_rate", DoubleType, nullable = true),
+  StructField("rerror_rate", DoubleType, nullable = true),
+  StructField("srv_rerror_rate", DoubleType, nullable = true),
+  StructField("same_srv_rate", DoubleType, nullable = true),
+  StructField("diff_srv_rate", DoubleType, nullable = true),
+  StructField("srv_diff_host_rate", DoubleType, nullable = true),
+  StructField("dst_host_count", IntegerType, nullable = true),
+  StructField("dst_host_srv_count", IntegerType, nullable = true),
+  StructField("dst_host_same_srv_rate", DoubleType, nullable = true),
+  StructField("dst_host_diff_srv_rate", DoubleType, nullable = true),
+  StructField("dst_host_same_src_port_rate", DoubleType, nullable = true),
+  StructField("dst_host_srv_diff_host_rate", DoubleType, nullable = true),
+  StructField("dst_host_serror_rate", DoubleType, nullable = true),
+  StructField("dst_host_srv_serror_rate", DoubleType, nullable = true),
+  StructField("dst_host_rerror_rate", DoubleType, nullable = true),
+  StructField("dst_host_srv_rerror_rate", DoubleType, nullable = true),
+  StructField("attack_type", StringType, nullable = true)
 ))
 
 println("\n1. CARGANDO DATOS...")
 println("-" * 80)
 
 // Cargar el dataset
+// NOTA: mode=PERMISSIVE permite registros con errores de parsing (los marca como null)
+//       emptyValue=null convierte strings vacíos en null para campos numéricos
 val rawData = spark.read
   .format("csv")
   .option("header", "false")
   .option("inferSchema", "false")
+  .option("mode", "PERMISSIVE")
+  .option("emptyValue", null)
+  .option("nullValue", "")
   .schema(schema)
   .load(PATH + DATA_FILE)
 
@@ -121,8 +127,18 @@ println("\n5. ANÁLISIS DE VALORES AUSENTES/NULOS")
 println("-" * 80)
 
 // Contar valores nulos por columna
+// NOTA: isNaN solo funciona con tipos Double/Float, no con Integer o String
 val nullCounts = rawData.columns.map { colName =>
-  (colName, rawData.filter(col(colName).isNull || col(colName) === "" || col(colName).isNaN).count())
+  val dataType = rawData.schema(colName).dataType
+  val nullCount = dataType match {
+    case DoubleType | FloatType => 
+      rawData.filter(col(colName).isNull || col(colName).isNaN).count()
+    case StringType => 
+      rawData.filter(col(colName).isNull || col(colName) === "").count()
+    case _ => 
+      rawData.filter(col(colName).isNull).count()
+  }
+  (colName, nullCount)
 }
 
 println("Columnas con valores ausentes:")
@@ -259,7 +275,7 @@ println("-" * 80)
 
 println("\n13.1. Distribución de protocol_type por attack_category:")
 dataWithCategory.groupBy("protocol_type", "attack_category").count()
-  .orderBy("protocol_type", desc("count")).show(20, false)
+  .orderBy(col("protocol_type"), desc("count")).show(20, false)
 
 println("\n13.2. Distribución de flag por attack_category (top 20 combinaciones):")
 dataWithCategory.groupBy("flag", "attack_category").count()
